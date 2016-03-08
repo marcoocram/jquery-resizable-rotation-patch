@@ -1,102 +1,17 @@
-$(document).ready(function(){
-	$.ui.resizable.prototype._mouseDrag = function(event) {
-		var angle = getAngle(this.element[0]);
+    /**
+    *
+    * NOTICE OF LICENSE
+    *
+    * This source file is subject to the Academic Free License (AFL 3.0)
+    * It is available through the world-wide-web at this URL:
+    * http://opensource.org/licenses/afl-3.0.php
+    * If you did not receive a copy of the license and are unable to
+    * obtain it through the world-wide-web, please send an email
+    * to tunisoft.solutions@gmail.com so we can send you a copy immediately.
+    *
+    * @author    Tunis-Soft <tunisoft.solutions@gmail.com>
+    * @copyright 2010-2014 Tuni-Soft
+    * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+    */
 
-		var data,
-			el = this.helper, props = {},
-			smp = this.originalMousePosition,
-			a = switchAxis(this.axis, angle),
-			prevTop = this.position.top,
-			prevLeft = this.position.left,
-			prevWidth = this.size.width,
-			prevHeight = this.size.height,
-			dx = (event.pageX-smp.left)||0,
-			dy = (event.pageY-smp.top)||0,
-			trigger = this._change[a];
-
-		if (!trigger) {
-			return false;
-		}
-
-		// Calculate the attrs that will be change
-		data = trigger.apply(this, [event, dx, dy]);
-
-		// Put this in the mouseDrag handler since the user can start pressing shift while resizing
-		this._updateVirtualBoundaries(event.shiftKey);
-		if (this._aspectRatio || event.shiftKey) {
-			data = this._updateRatio(data, event);
-		}
-
-		data = this._respectSize(data, event);
-
-		this._updateCache(data);
-
-		// plugins callbacks need to be called first
-		this._propagate("resize", event);
-
-		if (this.position.top !== prevTop) {
-			props.top = this.position.top + "px";
-		}
-		if (this.position.left !== prevLeft) {
-			props.left = this.position.left + "px";
-		}
-		if (this.size.width !== prevWidth) {
-			props.width = this.size.width + "px";
-		}
-		if (this.size.height !== prevHeight) {
-			props.height = this.size.height + "px";
-		}
-		el.css(props);
-
-		if (!this._helper && this._proportionallyResizeElements.length) {
-			this._proportionallyResize();
-		}
-
-		// Call the user callback if the element was resized
-		if ( ! $.isEmptyObject(props) ) {
-			this._trigger("resize", event, this.ui());
-		}
-
-		return false;
-	}
-
-	function getAngle(el) {
-		var st = window.getComputedStyle(el, null);
-		var tr = st.getPropertyValue("-webkit-transform") ||
-				st.getPropertyValue("-moz-transform") ||
-				st.getPropertyValue("-ms-transform") ||
-				st.getPropertyValue("-o-transform") ||
-				st.getPropertyValue("transform") ||
-				null;
-		if(tr && tr != "none"){
-			var values = tr.split('(')[1];
-				values = values.split(')')[0];
-				values = values.split(',');
-
-			var a = values[0];
-			var b = values[1];
-
-			var angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
-			return angle;
-		}
-		else
-			return 0;
-	}
-
-	function switchAxis(axis, angle) {
-		while(angle >= 360) angle = 360-angle;
-		while(angle < 0) angle = 360+angle;
-		var axisArray = ["n", "ne", "e", "se", "s", "sw", "w", "nw"];
-		var octant = Math.round(angle/45); // 0 .. 7
-		var index = 0;
-		if ( [].indexOf ) {
-			index = axisArray.indexOf(axis);
-		} else {
-	    	for(var i=0; i<axisArray.length; i++) {
-				if (axisArray[i] === axis) index = i;
-			}
-		}
-		var newAxisIndex = (index + octant) % 8;
-		return axisArray[newAxisIndex];
-	}
-});
+$(document).ready(function(){function e(e){return parseInt(e,10)||0}function t(e){var t=window.getComputedStyle(e,null),i=t.getPropertyValue("-webkit-transform")||t.getPropertyValue("-moz-transform")||t.getPropertyValue("-ms-transform")||t.getPropertyValue("-o-transform")||t.getPropertyValue("transform")||null;if(i&&"none"!=i){var s=i.split("(")[1];s=s.split(")")[0],s=s.split(",");for(var n=s[0],l=s[1],o=Math.round(Math.atan2(l,n)*(180/Math.PI));o>=360;)o=360-o;for(;0>o;)o=360+o;return o}return 0}function i(e){return isNaN(parseFloat(e))?0:parseFloat(e)}function s(e){return Math.round(100*(e+1e-5))/100}$.getCorrection=function(e,t,i,s,n){var n=n*Math.PI/180,l=-e/2,o=t/2,a=o*Math.sin(n)+l*Math.cos(n),r=o*Math.cos(n)-l*Math.sin(n),h={left:a-l,top:r-o},c=e+i,d=t+s,l=-c/2,o=d/2,a=o*Math.sin(n)+l*Math.cos(n),r=o*Math.cos(n)-l*Math.sin(n),u={left:a-l,top:r-o},p={left:u.left-h.left,top:u.top-h.top};return p},$.ui.resizable.prototype._mouseStart=function(t){var i,s,n,l=this.options,o=this.element;return this.resizing=!0,this._renderProxy(),i=e(this.helper.css("left")),s=e(this.helper.css("top")),l.containment&&(i+=$(l.containment).scrollLeft()||0,s+=$(l.containment).scrollTop()||0),this.offset=this.helper.offset(),this.position={left:i,top:s},this.size=this._helper?{width:this.helper.width(),height:this.helper.height()}:{width:o.width(),height:o.height()},this.originalSize=this._helper?{width:o.outerWidth(),height:o.outerHeight()}:{width:o.width(),height:o.height()},this.sizeDiff={width:o.outerWidth()-o.width(),height:o.outerHeight()-o.height()},this.originalPosition={left:i,top:s},this.originalMousePosition={left:t.pageX,top:t.pageY},this.lastData=this.originalPosition,this.aspectRatio="number"==typeof l.aspectRatio?l.aspectRatio:this.originalSize.width/this.originalSize.height||1,n=$(".ui-resizable-"+this.axis).css("cursor"),$("body").css("cursor","auto"===n?this.axis+"-resize":n),o.addClass("ui-resizable-resizing"),this._propagate("start",t),!0},$.ui.resizable.prototype._mouseDrag=function(e){var n,l=t(this.element[0]),o=l*Math.PI/180,a=this.helper,r={},h=this.originalMousePosition,c=this.axis,d=this.position.top,u=this.position.left,p=this.size.width,f=this.size.height,m=e.pageX-h.left||0,g=e.pageY-h.top||0,v=this._change[c],b=this.size.width,w=this.size.height;if(!v)return!1;var y=Math.cos(o),M=Math.sin(o);ndx=m*y+g*M,ndy=g*y-m*M,m=ndx,g=ndy,n=v.apply(this,[e,m,g]),this._updateVirtualBoundaries(e.shiftKey),(this._aspectRatio||e.shiftKey)&&(n=this._updateRatio(n,e)),n=this._respectSize(n,e);var C={left:this.position.left,top:this.position.top};this._updateCache(n),this.position={left:C.left,top:C.top};var x={left:i(n.left||this.lastData.left)-i(this.lastData.left),top:i(n.top||this.lastData.top)-i(this.lastData.top)},U={};U.left=x.left*y-x.top*M,U.top=x.top*y+x.left*M,U.left=s(U.left),U.top=s(U.top),this.position.left+=U.left,this.position.top+=U.top,this.lastData={left:i(n.left||this.lastData.left),top:i(n.top||this.lastData.top)},this._propagate("resize",e);var z=b-this.size.width,D=w-this.size.height,S=$.getCorrection(b,w,z,D,l);return this.position.left+=S.left,this.position.top-=S.top,this.position.top!==d&&(r.top=this.position.top+"px"),this.position.left!==u&&(r.left=this.position.left+"px"),this.size.width!==p&&(r.width=this.size.width+"px"),this.size.height!==f&&(r.height=this.size.height+"px"),a.css(r),!this._helper&&this._proportionallyResizeElements.length&&this._proportionallyResize(),$.isEmptyObject(r)||this._trigger("resize",e,this.ui()),!1}});
